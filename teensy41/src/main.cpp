@@ -12,8 +12,8 @@ constexpr uint8_t PIN_MAX31865_CS = 10;
 constexpr uint8_t BOARD_SPI_MOSI = 11;
 constexpr uint8_t BOARD_SPI_MISO = 12;
 constexpr uint8_t BOARD_SPI_SCK = 13;
-constexpr uint8_t PIN_I2C_SDA = 18;
-constexpr uint8_t PIN_I2C_SCL = 19;
+constexpr uint8_t PIN_I2C_SDA = 25;
+constexpr uint8_t PIN_I2C_SCL = 24;
 constexpr uint8_t PIN_MLX90614_SDA = 17;
 constexpr uint8_t PIN_MLX90614_SCL = 16;
 constexpr uint32_t MAX31865_SPI_CLOCK_HZ = 1000000;
@@ -59,13 +59,63 @@ void printFloatOrNan(float value, uint8_t digits) {
   else Serial.print("nan");
 }
 
+void diagnoseLis3mdlBus(const char* reason) {
+  // Capture the electrical state before any recovery or begin() call changes
+  // the I2C peripheral or generates additional clocks.
+  const int sda = digitalRead(PIN_I2C_SDA);
+  const int scl = digitalRead(PIN_I2C_SCL);
+
+  Serial.print("# LIS3MDL BUS DIAG reason=");
+  Serial.print(reason);
+  Serial.print(" SDA25=");
+  Serial.print(sda);
+  Serial.print(" SCL24=");
+  Serial.print(scl);
+  Serial.print(" state=");
+  if (sda == HIGH && scl == HIGH) Serial.println("IDLE_HIGH");
+  else if (sda == LOW && scl == HIGH) Serial.println("SDA_STUCK_LOW");
+  else if (sda == HIGH && scl == LOW) Serial.println("SCL_STUCK_LOW");
+  else Serial.println("BOTH_STUCK_LOW");
+
+  // Only issue a real register transaction when the bus is electrically idle.
+  // This is not an address-only scanner probe.
+  if (sda != HIGH || scl != HIGH || magnetometerAddress == 0) return;
+
+  constexpr uint8_t WHO_AM_I_REG = 0x0F;
+  Wire2.beginTransmission(magnetometerAddress);
+  Wire2.write(WHO_AM_I_REG);
+  const uint8_t txError = Wire2.endTransmission(false);
+  uint8_t rxCount = 0;
+  int whoAmI = -1;
+  if (txError == 0) {
+    rxCount = Wire2.requestFrom(magnetometerAddress, static_cast<uint8_t>(1),
+                                static_cast<uint8_t>(true));
+    if (rxCount == 1 && Wire2.available()) whoAmI = Wire2.read();
+  }
+
+  Serial.print("# LIS3MDL REG DIAG address=0x");
+  printHexByte(magnetometerAddress);
+  Serial.print(" tx_error=");
+  Serial.print(txError);
+  Serial.print(" rx_count=");
+  Serial.print(rxCount);
+  Serial.print(" who_am_i=");
+  if (whoAmI < 0) Serial.println("none");
+  else {
+    Serial.print("0x");
+    printHexByte(static_cast<uint8_t>(whoAmI));
+    Serial.println(whoAmI == 0x3D ? " OK" : " INVALID");
+  }
+}
+
 bool beginMagnetometer() {
-  if (magnetometer.begin_I2C(0x1C, &Wire)) {
+  if (magnetometer.begin_I2C(0x1C, &Wire2)) {
     magnetometerAddress = 0x1C;
-  } else if (magnetometer.begin_I2C(0x1E, &Wire)) {
+  } else if (magnetometer.begin_I2C(0x1E, &Wire2)) {
     magnetometerAddress = 0x1E;
   } else {
-    magnetometerAddress = 0;
+    // Preserve the last known address until diagnostics are complete.
+    diagnoseLis3mdlBus("begin_failed");
     Serial.println("# LIS3MDL FAIL: no response at 0x1C or 0x1E");
     return false;
   }
@@ -236,8 +286,10 @@ void setup() {
   pinMode(PIN_MAX31865_CS, OUTPUT);
   digitalWrite(PIN_MAX31865_CS, HIGH);
   SPI.begin();
-  Wire.begin();
-  Wire.setClock(I2C_CLOCK_HZ);
+  Wire2.setSDA(PIN_I2C_SDA);
+  Wire2.setSCL(PIN_I2C_SCL);
+  Wire2.begin();
+  Wire2.setClock(I2C_CLOCK_HZ);
   Wire1.setSDA(PIN_MLX90614_SDA);
   Wire1.setSCL(PIN_MLX90614_SCL);
   Wire1.begin();
@@ -259,7 +311,7 @@ void setup() {
   Serial.print(MAX31865_SPI_CLOCK_HZ);
   Serial.print("Hz mode=");
   Serial.println(MAX31865_SPI_MODE);
-  Serial.print("# I2C LIS3MDL Wire: SDA=");
+  Serial.print("# I2C LIS3MDL Wire2: SDA=");
   Serial.print(PIN_I2C_SDA);
   Serial.print(" SCL=");
   Serial.print(PIN_I2C_SCL);
@@ -301,6 +353,7 @@ void loop() {
     if (magValid) {
       magNorm = sqrtf(magX * magX + magY * magY + magZ * magZ);
     } else {
+      diagnoseLis3mdlBus("read_failed");
       Serial.println("# LIS3MDL read failed; scheduling reinitialization");
       magnetometerReady = false;
     }

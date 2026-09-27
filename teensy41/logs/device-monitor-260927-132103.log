@@ -1,0 +1,87 @@
+
+# TEENSY 4.1 THREE-SENSOR LOGGER
+# SPI MAX31865: CS=10 MOSI=11 MISO=12 SCK=13
+# MAX31865 SPI: clock=1000000Hz mode=4
+# I2C LIS3MDL Wire2: SDA=25 SCL=24 clock=50000
+# I2C MLX90614 Wire1: SDA=17 SCL=16 clock=50000
+# LIS3MDL begin attempt 1/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 2/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 3/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 4/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 5/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL unavailable after 5 attempts
+# MLX90614 begin attempt 1/5
+# MLX90614 READY at 0x5A; registers verified
+# MAX31865 begin attempt 1/5
+# MAX31865 READY (3-wire PT1000)
+time_ms,mag_x_uT,mag_y_uT,mag_z_uT,mag_norm_uT,ir_ambient_C,ir_object_C,rtd_raw,rtd_ohm,rtd_C,mag_valid,ir_valid,rtd_valid,rtd_fault
+8406,nan,nan,nan,nan,27.29,27.27,7850,1109.18,28.05,0,1,1,0x00
+
+# SENSOR REINITIALIZATION BEGIN reason=nan_detected
+# LIS3MDL begin attempt 1/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 2/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 3/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 4/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 5/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL unavailable after 5 attempts
+# MLX90614 begin attempt 1/5
+# MLX90614 READY at 0x5A; registers verified
+# MAX31865 begin attempt 1/5
+# MAX31865 READY (3-wire PT1000)
+# SENSOR REINITIALIZATION END LIS3MDL=0 MLX90614=1 MAX31865=1
+time_ms,mag_x_uT,mag_y_uT,mag_z_uT,mag_norm_uT,ir_ambient_C,ir_object_C,rtd_raw,rtd_ohm,rtd_C,mag_valid,ir_valid,rtd_valid,rtd_fault
+10089,nan,nan,nan,nan,27.29,27.31,7850,1109.18,28.05,0,1,1,0x00
+10589,nan,nan,nan,nan,27.31,27.13,7850,1109.18,28.05,0,1,1,0x00
+11089,nan,nan,nan,nan,27.31,27.35,7850,1109.18,28.05,0,1,1,0x00
+# LIS3MDL begin attempt 1/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 2/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 3/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 4/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 5/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL unavailable after 5 attempts
+11589,nan,nan,nan,nan,27.31,27.29,7850,1109.18,28.05,0,1,1,0x00
+12269,nan,nan,nan,nan,27.31,27.31,7850,1109.18,28.05,0,1,1,0x00
+12769,nan,nan,nan,nan,27.31,27.33,7851,1109.32,28.09,0,1,1,0x00
+13269,nan,nan,nan,nan,27.31,27.25,7850,1109.18,28.05,0,1,1,0x00
+# LIS3MDL begin attempt 1/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 2/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 3/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E
+# LIS3MDL begin attempt 4/5
+# LIS3MDL BUS DIAG reason=begin_failed SDA25=0 SCL24=0 state=BOTH_STUCK_LOW
+# LIS3MDL FAIL: no response at 0x1C or 0x1E

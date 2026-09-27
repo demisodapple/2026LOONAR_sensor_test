@@ -18,7 +18,7 @@ constexpr uint8_t PIN_SPI_MISO = 13;
 
 constexpr uint8_t MLX90614_ADDRESS = 0x5A;
 constexpr uint32_t SERIAL_BAUD = 115200;
-constexpr uint32_t I2C_CLOCK_HZ = 100000;
+constexpr uint32_t I2C_CLOCK_HZ = 50000;
 constexpr uint32_t POWER_STABILIZE_MS = 5000;
 constexpr uint32_t BUS_STABILIZE_MS = 500;
 constexpr uint32_t RETRY_DELAY_MS = 150;

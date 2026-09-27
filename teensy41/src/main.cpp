@@ -12,15 +12,15 @@ constexpr uint8_t PIN_MAX31865_CS = 10;
 constexpr uint8_t BOARD_SPI_MOSI = 11;
 constexpr uint8_t BOARD_SPI_MISO = 12;
 constexpr uint8_t BOARD_SPI_SCK = 13;
-constexpr uint8_t PIN_I2C_SDA = 25;
-constexpr uint8_t PIN_I2C_SCL = 24;
+constexpr uint8_t PIN_LIS3MDL_SDA = 25;
+constexpr uint8_t PIN_LIS3MDL_SCL = 24;
 constexpr uint8_t PIN_MLX90614_SDA = 17;
 constexpr uint8_t PIN_MLX90614_SCL = 16;
 constexpr uint32_t MAX31865_SPI_CLOCK_HZ = 1000000;
 constexpr uint8_t MAX31865_SPI_MODE = SPI_MODE1;
 
 constexpr uint8_t MLX90614_ADDRESS = 0x5A;
-constexpr uint32_t I2C_CLOCK_HZ = 100000;
+constexpr uint32_t I2C_CLOCK_HZ = 50000;
 constexpr uint32_t MLX90614_I2C_CLOCK_HZ = 50000;
 constexpr uint32_t POWER_STABILIZE_MS = 5000;
 constexpr uint32_t BUS_STABILIZE_MS = 250;
@@ -30,6 +30,7 @@ constexpr uint8_t BEGIN_MAX_ATTEMPTS = 5;
 constexpr uint32_t SAMPLE_INTERVAL_MS = 500;
 constexpr uint32_t RETRY_INTERVAL_MS = 2000;
 constexpr uint32_t MLX90614_COOLDOWN_MS = 10000;
+constexpr uint32_t PERIODIC_REINIT_INTERVAL_MS = 5UL * 60UL * 1000UL;
 
 constexpr float RTD_NOMINAL_OHM = 1000.0f;  // PT1000
 constexpr float RTD_REFERENCE_OHM = 4630.0f;
@@ -48,6 +49,7 @@ uint32_t lastSampleMs = 0;
 uint32_t lastRetryMs = 0;
 uint32_t mlxNextRetryMs = 0;
 uint8_t mlxRuntimeFailures = 0;
+uint32_t lastPeriodicReinitMs = 0;
 
 void printHexByte(uint8_t value) {
   if (value < 0x10) Serial.print('0');
@@ -62,8 +64,8 @@ void printFloatOrNan(float value, uint8_t digits) {
 void diagnoseLis3mdlBus(const char* reason) {
   // Capture the electrical state before any recovery or begin() call changes
   // the I2C peripheral or generates additional clocks.
-  const int sda = digitalRead(PIN_I2C_SDA);
-  const int scl = digitalRead(PIN_I2C_SCL);
+  const int sda = digitalRead(PIN_LIS3MDL_SDA);
+  const int scl = digitalRead(PIN_LIS3MDL_SCL);
 
   Serial.print("# LIS3MDL BUS DIAG reason=");
   Serial.print(reason);
@@ -114,12 +116,14 @@ bool beginMagnetometer() {
   } else if (magnetometer.begin_I2C(0x1E, &Wire2)) {
     magnetometerAddress = 0x1E;
   } else {
+    Wire2.setClock(I2C_CLOCK_HZ);
     // Preserve the last known address until diagnostics are complete.
     diagnoseLis3mdlBus("begin_failed");
     Serial.println("# LIS3MDL FAIL: no response at 0x1C or 0x1E");
     return false;
   }
 
+  Wire2.setClock(I2C_CLOCK_HZ);
   magnetometer.setPerformanceMode(LIS3MDL_MEDIUMMODE);
   magnetometer.setOperationMode(LIS3MDL_CONTINUOUSMODE);
   magnetometer.setDataRate(LIS3MDL_DATARATE_20_HZ);
@@ -221,6 +225,8 @@ bool beginRtd() {
   return true;
 }
 
+void printCsvHeader();
+
 bool beginWithRetries(const char* name, bool (*beginSensor)()) {
   for (uint8_t attempt = 1; attempt <= BEGIN_MAX_ATTEMPTS; ++attempt) {
     Serial.print("# ");
@@ -236,6 +242,45 @@ bool beginWithRetries(const char* name, bool (*beginSensor)()) {
   Serial.print(name);
   Serial.println(" unavailable after 5 attempts");
   return false;
+}
+
+void periodicallyReinitializeSensors() {
+  Serial.println();
+  Serial.println("# PERIODIC 5-MINUTE SENSOR REINITIALIZATION BEGIN");
+
+  pinMode(PIN_MAX31865_CS, OUTPUT);
+  digitalWrite(PIN_MAX31865_CS, HIGH);
+  SPI.begin();
+
+  Wire2.setSDA(PIN_LIS3MDL_SDA);
+  Wire2.setSCL(PIN_LIS3MDL_SCL);
+  Wire2.begin();
+  Wire2.setClock(I2C_CLOCK_HZ);
+  Wire1.setSDA(PIN_MLX90614_SDA);
+  Wire1.setSCL(PIN_MLX90614_SCL);
+  Wire1.begin();
+  Wire1.setClock(MLX90614_I2C_CLOCK_HZ);
+  delay(BUS_STABILIZE_MS);
+  delay(WIRE_STABILIZE_MS - BUS_STABILIZE_MS);
+
+  magnetometerReady = beginWithRetries("LIS3MDL", beginMagnetometer);
+  infraredReady = beginWithRetries("MLX90614", beginInfrared);
+  rtdReady = beginWithRetries("MAX31865", beginRtd);
+
+  mlxRuntimeFailures = 0;
+  const uint32_t completedMs = millis();
+  mlxNextRetryMs = infraredReady ? 0 : completedMs + MLX90614_COOLDOWN_MS;
+  lastRetryMs = completedMs;
+  lastSampleMs = completedMs;
+  lastPeriodicReinitMs = completedMs;
+
+  Serial.print("# PERIODIC REINITIALIZATION END LIS3MDL=");
+  Serial.print(magnetometerReady ? 1 : 0);
+  Serial.print(" MLX90614=");
+  Serial.print(infraredReady ? 1 : 0);
+  Serial.print(" MAX31865=");
+  Serial.println(rtdReady ? 1 : 0);
+  printCsvHeader();
 }
 
 void retryMissingSensors(uint32_t now) {
@@ -286,8 +331,8 @@ void setup() {
   pinMode(PIN_MAX31865_CS, OUTPUT);
   digitalWrite(PIN_MAX31865_CS, HIGH);
   SPI.begin();
-  Wire2.setSDA(PIN_I2C_SDA);
-  Wire2.setSCL(PIN_I2C_SCL);
+  Wire2.setSDA(PIN_LIS3MDL_SDA);
+  Wire2.setSCL(PIN_LIS3MDL_SCL);
   Wire2.begin();
   Wire2.setClock(I2C_CLOCK_HZ);
   Wire1.setSDA(PIN_MLX90614_SDA);
@@ -312,9 +357,9 @@ void setup() {
   Serial.print("Hz mode=");
   Serial.println(MAX31865_SPI_MODE);
   Serial.print("# I2C LIS3MDL Wire2: SDA=");
-  Serial.print(PIN_I2C_SDA);
+  Serial.print(PIN_LIS3MDL_SDA);
   Serial.print(" SCL=");
-  Serial.print(PIN_I2C_SCL);
+  Serial.print(PIN_LIS3MDL_SCL);
   Serial.print(" clock=");
   Serial.println(I2C_CLOCK_HZ);
   Serial.print("# I2C MLX90614 Wire1: SDA=");
@@ -331,10 +376,15 @@ void setup() {
   printCsvHeader();
   lastRetryMs = millis();
   mlxNextRetryMs = infraredReady ? 0 : millis() + MLX90614_COOLDOWN_MS;
+  lastPeriodicReinitMs = millis();
 }
 
 void loop() {
   const uint32_t now = millis();
+  if (now - lastPeriodicReinitMs >= PERIODIC_REINIT_INTERVAL_MS) {
+    periodicallyReinitializeSensors();
+    return;
+  }
   // Do not read other sensors while MLX90614 initialization is running.
   if (retryInfrared(now)) return;
   retryMissingSensors(now);

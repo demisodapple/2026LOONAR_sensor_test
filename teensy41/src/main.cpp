@@ -50,6 +50,7 @@ uint32_t lastRetryMs = 0;
 uint32_t mlxNextRetryMs = 0;
 uint8_t mlxRuntimeFailures = 0;
 uint32_t lastPeriodicReinitMs = 0;
+bool nanRecoveryArmed = true;
 
 void printHexByte(uint8_t value) {
   if (value < 0x10) Serial.print('0');
@@ -59,6 +60,23 @@ void printHexByte(uint8_t value) {
 void printFloatOrNan(float value, uint8_t digits) {
   if (isfinite(value)) Serial.print(value, digits);
   else Serial.print("nan");
+}
+
+void printLis3mdlLineState(const char* phase) {
+  const int sda = digitalRead(PIN_LIS3MDL_SDA);
+  const int scl = digitalRead(PIN_LIS3MDL_SCL);
+
+  Serial.print("# LIS3MDL BUS STATE phase=");
+  Serial.print(phase);
+  Serial.print(" SDA25=");
+  Serial.print(sda);
+  Serial.print(" SCL24=");
+  Serial.print(scl);
+  Serial.print(" state=");
+  if (sda == HIGH && scl == HIGH) Serial.println("IDLE_HIGH");
+  else if (sda == LOW && scl == HIGH) Serial.println("SDA_STUCK_LOW");
+  else if (sda == HIGH && scl == LOW) Serial.println("SCL_STUCK_LOW");
+  else Serial.println("BOTH_STUCK_LOW");
 }
 
 void diagnoseLis3mdlBus(const char* reason) {
@@ -111,6 +129,7 @@ void diagnoseLis3mdlBus(const char* reason) {
 }
 
 bool beginMagnetometer() {
+  printLis3mdlLineState("before_sensor_begin");
   if (magnetometer.begin_I2C(0x1C, &Wire2)) {
     magnetometerAddress = 0x1C;
   } else if (magnetometer.begin_I2C(0x1E, &Wire2)) {
@@ -123,11 +142,13 @@ bool beginMagnetometer() {
     return false;
   }
 
+  printLis3mdlLineState("after_sensor_begin");
   Wire2.setClock(I2C_CLOCK_HZ);
   magnetometer.setPerformanceMode(LIS3MDL_MEDIUMMODE);
   magnetometer.setOperationMode(LIS3MDL_CONTINUOUSMODE);
   magnetometer.setDataRate(LIS3MDL_DATARATE_20_HZ);
   magnetometer.setRange(LIS3MDL_RANGE_4_GAUSS);
+  printLis3mdlLineState("after_sensor_config");
   Serial.print("# LIS3MDL READY at 0x");
   printHexByte(magnetometerAddress);
   Serial.println();
@@ -244,9 +265,10 @@ bool beginWithRetries(const char* name, bool (*beginSensor)()) {
   return false;
 }
 
-void periodicallyReinitializeSensors() {
+void reinitializeSensors(const char* reason) {
   Serial.println();
-  Serial.println("# PERIODIC 5-MINUTE SENSOR REINITIALIZATION BEGIN");
+  Serial.print("# SENSOR REINITIALIZATION BEGIN reason=");
+  Serial.println(reason);
 
   pinMode(PIN_MAX31865_CS, OUTPUT);
   digitalWrite(PIN_MAX31865_CS, HIGH);
@@ -262,6 +284,7 @@ void periodicallyReinitializeSensors() {
   Wire1.setClock(MLX90614_I2C_CLOCK_HZ);
   delay(BUS_STABILIZE_MS);
   delay(WIRE_STABILIZE_MS - BUS_STABILIZE_MS);
+  printLis3mdlLineState("after_wire2_reinit");
 
   magnetometerReady = beginWithRetries("LIS3MDL", beginMagnetometer);
   infraredReady = beginWithRetries("MLX90614", beginInfrared);
@@ -274,7 +297,7 @@ void periodicallyReinitializeSensors() {
   lastSampleMs = completedMs;
   lastPeriodicReinitMs = completedMs;
 
-  Serial.print("# PERIODIC REINITIALIZATION END LIS3MDL=");
+  Serial.print("# SENSOR REINITIALIZATION END LIS3MDL=");
   Serial.print(magnetometerReady ? 1 : 0);
   Serial.print(" MLX90614=");
   Serial.print(infraredReady ? 1 : 0);
@@ -341,6 +364,7 @@ void setup() {
   Wire1.setClock(MLX90614_I2C_CLOCK_HZ);
   delay(BUS_STABILIZE_MS);
   delay(WIRE_STABILIZE_MS - BUS_STABILIZE_MS);
+  printLis3mdlLineState("after_wire2_setup");
 
   Serial.println();
   Serial.println("# TEENSY 4.1 THREE-SENSOR LOGGER");
@@ -382,7 +406,7 @@ void setup() {
 void loop() {
   const uint32_t now = millis();
   if (now - lastPeriodicReinitMs >= PERIODIC_REINIT_INTERVAL_MS) {
-    periodicallyReinitializeSensors();
+    reinitializeSensors("periodic_5min");
     return;
   }
   // Do not read other sensors while MLX90614 initialization is running.
@@ -449,4 +473,15 @@ void loop() {
   Serial.print(','); Serial.print(rtdValid ? 1 : 0);
   Serial.print(",0x"); printHexByte(rtdFault);
   Serial.println();
+
+  const bool sampleHasNan = !isfinite(magX) || !isfinite(magY) ||
+                            !isfinite(magZ) || !isfinite(magNorm) ||
+                            !isfinite(irAmbientC) || !isfinite(irObjectC) ||
+                            !isfinite(rtdOhm) || !isfinite(rtdC);
+  if (sampleHasNan && nanRecoveryArmed) {
+    nanRecoveryArmed = false;
+    reinitializeSensors("nan_detected");
+  } else if (!sampleHasNan) {
+    nanRecoveryArmed = true;
+  }
 }

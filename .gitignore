@@ -1,3 +1,7 @@
 .pio/
 .pio_core_temp/
 .vscode/
+.venv/
+__pycache__/
+*.pyc
+logs/sessions/

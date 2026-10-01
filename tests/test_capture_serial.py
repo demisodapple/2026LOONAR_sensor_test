@@ -5,10 +5,17 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from capture_serial import capture
+from capture_serial import FIRMWARE_HEADER, capture
 
 
 class CaptureTests(unittest.TestCase):
+    def test_captures_rows_after_firmware_header_was_missed(self):
+        row = ["500"] + ["1"] * (len(FIRMWARE_HEADER) - 1)
+        csv_out, raw_out = io.StringIO(), io.StringIO()
+        self.assertEqual(capture(["# already running", ",".join(row)], csv_out, raw_out), 1)
+        rows = list(csv.reader(io.StringIO(csv_out.getvalue())))
+        self.assertEqual(rows, [FIRMWARE_HEADER, row])
+
     def test_preserves_invalid_rows_and_ignores_diagnostics(self):
         header = "time_ms,mag_x_uT,mag_y_uT,mag_z_uT,mag_valid"
         lines = ["# LIS3MDL BUS STATE", header, "500,1,2,3,1",

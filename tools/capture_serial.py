@@ -11,6 +11,13 @@ from pathlib import Path
 
 
 REQUIRED = {"time_ms", "mag_x_uT", "mag_y_uT", "mag_z_uT", "mag_valid"}
+FIRMWARE_HEADER = [
+    "time_ms", "mag_x_uT", "mag_y_uT", "mag_z_uT", "mag_norm_uT",
+    "ir_ambient_C", "ir_object_C", "rtd_raw", "rtd_ohm", "rtd_C",
+    "mag_valid", "ir_valid", "rtd_valid", "rtd_fault",
+    "mag_cal_x_uT", "mag_cal_y_uT", "mag_cal_z_uT", "mag_cal_norm_uT",
+    "mag_cal_valid", "mag_cal_science_ready",
+]
 SESSION = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,79}\Z")
 
 
@@ -66,6 +73,11 @@ def capture(source, csv_file, raw_file, deadline=None):
                 writer.writerow(header)
                 csv_file.flush()
             continue
+        if header is None and len(row) == len(FIRMWARE_HEADER) and row[0].isdigit():
+            # Teensy may have printed its one-time header before this port opened.
+            header = FIRMWARE_HEADER
+            writer.writerow(header)
+            csv_file.flush()
         if header is None or len(row) != len(header) or not row[0].isdigit():
             continue
         writer.writerow(row)

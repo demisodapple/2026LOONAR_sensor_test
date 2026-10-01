@@ -20,6 +20,8 @@ PowerShell에서 이 폴더를 연 뒤:
 
 ## 2. 노트북에서 측정 파일 만들기
 
+Teensy는 전원이 들어오면 스스로 센서를 읽어 USB 시리얼로 CSV를 출력한다. `pio device monitor`는 화면 확인용이고 파일을 저장하지 않는다. 측정 파일은 아래 `capture_serial.py`로 만들며, **monitor를 종료한 뒤** 실행한다. 한 포트는 두 프로그램이 동시에 열 수 없다. 로거를 늦게 시작해 초기 CSV 헤더를 놓쳐도 현재 펌웨어 형식의 측정 행부터 저장한다.
+
 이 PC에서는 PlatformIO의 Python에 `pyserial`(USB 로깅)이, Codex Python에 `numpy`(피팅)가 이미 있다. 아래 두 경로를 각각 사용한다. 다른 PC에서는 일반 Python에 `requirements.txt`를 설치하면 된다.
 
 ```powershell

@@ -1,0 +1,31 @@
+21:41:20.329 > 
+21:41:20.329 > # ESP32-S3 THREE-SENSOR TEST
+21:41:20.329 > # I2C SDA=8 SCL=9 clock=100000Hz
+21:41:20.329 > # SPI CS=10 MOSI=11 MISO=13 SCK=12 mode=1 clock=1MHz
+21:41:20.329 > # I2C SCAN BEGIN
+21:41:20.345 > # I2C FOUND 0x5A MLX90614
+21:41:20.358 > # I2C SCAN END count=1
+21:41:20.358 > # LIS3MDL begin attempt 1/5
+21:41:20.358 > # LIS3MDL FAIL
+21:41:20.501 > # LIS3MDL begin attempt 2/5
+21:41:20.501 > # LIS3MDL FAIL
+21:41:20.644 > # LIS3MDL begin attempt 3/5
+21:41:20.644 > # LIS3MDL FAIL
+21:41:20.796 > # LIS3MDL begin attempt 4/5
+21:41:20.796 > # LIS3MDL FAIL
+21:41:20.957 > # LIS3MDL begin attempt 5/5
+21:41:20.957 > # LIS3MDL FAIL
+21:41:20.957 > # LIS3MDL unavailable after 5 attempts
+21:41:20.957 > # MLX90614 begin attempt 1/5
+21:41:20.957 > # MLX90614 READY address=0x5A
+21:41:20.957 > # MAX31865 begin attempt 1/5
+21:41:20.959 > # MAX31865 READY: SPI read-back OK, mode=1, clock=1MHz
+21:41:20.959 > time_ms,mag_x_uT,mag_y_uT,mag_z_uT,mag_norm_uT,ir_ambient_C,ir_object_C,rtd_raw,rtd_ohm,rtd_C,mag_valid,ir_valid,rtd_valid,rtd_fault
+21:41:21.035 > 6215,nan,nan,nan,nan,25.37,24.91,7888,1114.55,29.44,0,1,1,0x00
+21:41:21.528 > 6715,nan,nan,nan,nan,25.37,24.71,7888,1114.55,29.44,0,1,1,0x00
+21:41:22.027 > 7215,nan,nan,nan,nan,25.39,24.83,7888,1114.55,29.44,0,1,1,0x00
+21:41:22.537 > 7715,nan,nan,nan,nan,25.37,24.89,7888,1114.55,29.44,0,1,1,0x00
+21:41:22.958 > # LIS3MDL begin attempt 1/5
+21:41:22.958 > # LIS3MDL FAIL
+21:41:23.101 > # LIS3MDL begin attempt 2/5
+21:41:23.110 > # LIS3MDL FAIL

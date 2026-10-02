@@ -1,0 +1,167 @@
+21:41:43.451 > # LIS3MDL begin attempt 1/5
+21:41:43.451 > # LIS3MDL FAIL
+21:41:43.600 > # LIS3MDL begin attempt 2/5
+21:41:43.600 > # LIS3MDL FAIL
+21:41:43.750 > # LIS3MDL begin attempt 3/5
+21:41:43.750 > # LIS3MDL FAIL
+21:41:43.899 > # LIS3MDL begin attempt 4/5
+21:41:43.901 > # LIS3MDL FAIL
+21:41:44.044 > # LIS3MDL begin attempt 5/5
+21:41:44.044 > # LIS3MDL FAIL
+21:41:44.044 > # LIS3MDL unavailable after 5 attempts
+21:41:44.128 > 20918,nan,nan,nan,nan,25.41,24.77,7887,1114.40,29.40,0,1,1,0x00
+21:41:44.628 > 21418,nan,nan,nan,nan,25.45,24.73,7888,1114.55,29.44,0,1,1,0x00
+21:41:45.128 > 21918,nan,nan,nan,nan,25.43,24.85,7888,1114.55,29.44,0,1,1,0x00
+21:41:45.436 > # LIS3MDL begin attempt 1/5
+21:41:45.451 > # LIS3MDL FAIL
+21:41:45.600 > # LIS3MDL begin attempt 2/5
+21:41:45.600 > # LIS3MDL FAIL
+21:41:45.742 > # LIS3MDL begin attempt 3/5
+21:41:45.742 > # LIS3MDL FAIL
+21:41:45.894 > # LIS3MDL begin attempt 4/5
+21:41:45.894 > # LIS3MDL FAIL
+21:41:46.052 > # LIS3MDL begin attempt 5/5
+21:41:46.052 > # LIS3MDL FAIL
+21:41:46.052 > # LIS3MDL unavailable after 5 attempts
+21:41:46.128 > 22918,nan,nan,nan,nan,25.43,24.83,7888,1114.55,29.44,0,1,1,0x00
+21:41:46.621 > 23418,nan,nan,nan,nan,25.41,24.77,7888,1114.55,29.44,0,1,1,0x00
+21:41:47.128 > 23918,nan,nan,nan,nan,25.43,24.73,7888,1114.55,29.44,0,1,1,0x00
+21:41:47.445 > # LIS3MDL begin attempt 1/5
+21:41:47.445 > # LIS3MDL FAIL
+21:41:47.600 > # LIS3MDL begin attempt 2/5
+21:41:47.600 > # LIS3MDL FAIL
+21:41:47.745 > # LIS3MDL begin attempt 3/5
+21:41:47.745 > # LIS3MDL FAIL
+21:41:47.897 > # LIS3MDL begin attempt 4/5
+21:41:47.897 > # LIS3MDL FAIL
+21:41:48.050 > # LIS3MDL begin attempt 5/5
+21:41:48.050 > # LIS3MDL FAIL
+21:41:48.050 > # LIS3MDL unavailable after 5 attempts
+21:41:48.128 > 24918,nan,nan,nan,nan,25.45,25.03,7888,1114.55,29.44,0,1,1,0x00
+21:41:48.620 > 25418,nan,nan,nan,nan,25.45,25.01,7888,1114.55,29.44,0,1,1,0x00
+21:41:49.121 > 25918,nan,nan,nan,nan,25.43,24.83,7888,1114.55,29.44,0,1,1,0x00
+21:41:49.449 > # LIS3MDL begin attempt 1/5
+21:41:49.449 > # LIS3MDL FAIL
+21:41:49.595 > # LIS3MDL begin attempt 2/5
+21:41:49.595 > # LIS3MDL FAIL
+21:41:49.750 > # LIS3MDL begin attempt 3/5
+21:41:49.750 > # LIS3MDL FAIL
+21:41:49.893 > # LIS3MDL begin attempt 4/5
+21:41:49.893 > # LIS3MDL FAIL
+21:41:50.050 > # LIS3MDL begin attempt 5/5
+21:41:50.050 > # LIS3MDL FAIL
+21:41:50.050 > # LIS3MDL unavailable after 5 attempts
+21:41:50.129 > 26918,nan,nan,nan,nan,25.45,24.89,7888,1114.55,29.44,0,1,1,0x00
+21:41:50.627 > 27418,nan,nan,nan,nan,25.45,24.71,7889,1114.69,29.47,0,1,1,0x00
+21:41:51.114 > 27918,nan,nan,nan,nan,25.45,24.77,7889,1114.69,29.47,0,1,1,0x00
+21:41:51.441 > # LIS3MDL begin attempt 1/5
+21:41:51.441 > # LIS3MDL FAIL
+21:41:51.593 > # LIS3MDL begin attempt 2/5
+21:41:51.593 > # LIS3MDL FAIL
+21:41:51.751 > # LIS3MDL begin attempt 3/5
+21:41:51.751 > # LIS3MDL FAIL
+21:41:51.901 > # LIS3MDL begin attempt 4/5
+21:41:51.901 > # LIS3MDL FAIL
+21:41:52.048 > # LIS3MDL begin attempt 5/5
+21:41:52.048 > # LIS3MDL FAIL
+21:41:52.048 > # LIS3MDL unavailable after 5 attempts
+21:41:52.127 > 28918,nan,nan,nan,nan,25.45,24.63,7889,1114.69,29.47,0,1,1,0x00
+21:41:52.625 > 29418,nan,nan,nan,nan,25.43,24.77,7889,1114.69,29.47,0,1,1,0x00
+21:41:53.122 > 29918,nan,nan,nan,nan,25.43,24.67,7889,1114.69,29.47,0,1,1,0x00
+21:41:53.443 > # LIS3MDL begin attempt 1/5
+21:41:53.443 > # LIS3MDL FAIL
+21:41:53.601 > # LIS3MDL begin attempt 2/5
+21:41:53.601 > # LIS3MDL FAIL
+21:41:53.750 > # LIS3MDL begin attempt 3/5
+21:41:53.750 > # LIS3MDL FAIL
+21:41:53.892 > # LIS3MDL begin attempt 4/5
+21:41:53.892 > # LIS3MDL FAIL
+21:41:54.036 > # LIS3MDL begin attempt 5/5
+21:41:54.036 > # LIS3MDL FAIL
+21:41:54.036 > # LIS3MDL unavailable after 5 attempts
+21:41:54.129 > 30918,nan,nan,nan,nan,25.45,24.87,7889,1114.69,29.47,0,1,1,0x00
+21:41:54.617 > 31418,nan,nan,nan,nan,25.45,24.87,7890,1114.83,29.51,0,1,1,0x00
+21:41:55.125 > 31918,nan,nan,nan,nan,25.45,24.83,7890,1114.83,29.51,0,1,1,0x00
+21:41:55.438 > # LIS3MDL begin attempt 1/5
+21:41:55.438 > # LIS3MDL FAIL
+21:41:55.593 > # LIS3MDL begin attempt 2/5
+21:41:55.593 > # LIS3MDL FAIL
+21:41:55.743 > # LIS3MDL begin attempt 3/5
+21:41:55.743 > # LIS3MDL FAIL
+21:41:55.893 > # LIS3MDL begin attempt 4/5
+21:41:55.893 > # LIS3MDL FAIL
+21:41:56.043 > # LIS3MDL begin attempt 5/5
+21:41:56.043 > # LIS3MDL FAIL
+21:41:56.043 > # LIS3MDL unavailable after 5 attempts
+21:41:56.128 > 32918,nan,nan,nan,nan,25.45,24.83,7891,1114.97,29.55,0,1,1,0x00
+21:41:56.614 > 33418,nan,nan,nan,nan,25.45,24.77,7891,1114.97,29.55,0,1,1,0x00
+21:41:57.113 > 33918,nan,nan,nan,nan,25.43,24.89,7891,1114.97,29.55,0,1,1,0x00
+21:41:57.446 > # LIS3MDL begin attempt 1/5
+21:41:57.446 > # LIS3MDL FAIL
+21:41:57.600 > # LIS3MDL begin attempt 2/5
+21:41:57.600 > # LIS3MDL FAIL
+21:41:57.744 > # LIS3MDL begin attempt 3/5
+21:41:57.744 > # LIS3MDL FAIL
+21:41:57.894 > # LIS3MDL begin attempt 4/5
+21:41:57.894 > # LIS3MDL FAIL
+21:41:58.042 > # LIS3MDL begin attempt 5/5
+21:41:58.042 > # LIS3MDL FAIL
+21:41:58.042 > # LIS3MDL unavailable after 5 attempts
+21:41:58.128 > 34918,nan,nan,nan,nan,25.45,24.99,7891,1114.97,29.55,0,1,1,0x00
+21:41:58.620 > 35418,nan,nan,nan,nan,25.45,24.95,7891,1114.97,29.55,0,1,1,0x00
+21:41:59.114 > 35918,nan,nan,nan,nan,25.43,24.87,7891,1114.97,29.55,0,1,1,0x00
+21:41:59.450 > # LIS3MDL begin attempt 1/5
+21:41:59.451 > # LIS3MDL FAIL
+21:41:59.600 > # LIS3MDL begin attempt 2/5
+21:41:59.600 > # LIS3MDL FAIL
+21:41:59.745 > # LIS3MDL begin attempt 3/5
+21:41:59.745 > # LIS3MDL FAIL
+21:41:59.893 > # LIS3MDL begin attempt 4/5
+21:41:59.893 > # LIS3MDL FAIL
+21:42:00.050 > # LIS3MDL begin attempt 5/5
+21:42:00.050 > # LIS3MDL FAIL
+21:42:00.050 > # LIS3MDL unavailable after 5 attempts
+21:42:00.127 > 36918,nan,nan,nan,nan,25.45,24.95,7892,1115.11,29.58,0,1,1,0x00
+21:42:00.617 > 37418,nan,nan,nan,nan,25.45,24.91,7892,1115.11,29.58,0,1,1,0x00
+21:42:01.113 > 37918,nan,nan,nan,nan,25.45,24.87,7892,1115.11,29.58,0,1,1,0x00
+21:42:01.445 > # LIS3MDL begin attempt 1/5
+21:42:01.445 > # LIS3MDL FAIL
+21:42:01.593 > # LIS3MDL begin attempt 2/5
+21:42:01.593 > # LIS3MDL FAIL
+21:42:01.750 > # LIS3MDL begin attempt 3/5
+21:42:01.750 > # LIS3MDL FAIL
+21:42:01.895 > # LIS3MDL begin attempt 4/5
+21:42:01.895 > # LIS3MDL FAIL
+21:42:02.050 > # LIS3MDL begin attempt 5/5
+21:42:02.050 > # LIS3MDL FAIL
+21:42:02.050 > # LIS3MDL unavailable after 5 attempts
+21:42:02.127 > 38918,nan,nan,nan,nan,25.47,24.85,7892,1115.11,29.58,0,1,1,0x00
+21:42:02.621 > 39418,nan,nan,nan,nan,25.49,24.95,7892,1115.11,29.58,0,1,1,0x00
+21:42:03.123 > 39918,nan,nan,nan,nan,25.47,24.83,7892,1115.11,29.58,0,1,1,0x00
+21:42:03.442 > # LIS3MDL begin attempt 1/5
+21:42:03.442 > # LIS3MDL FAIL
+21:42:03.592 > # LIS3MDL begin attempt 2/5
+21:42:03.592 > # LIS3MDL FAIL
+21:42:03.735 > # LIS3MDL begin attempt 3/5
+21:42:03.751 > # LIS3MDL FAIL
+21:42:03.900 > # LIS3MDL begin attempt 4/5
+21:42:03.900 > # LIS3MDL FAIL
+21:42:04.043 > # LIS3MDL begin attempt 5/5
+21:42:04.043 > # LIS3MDL FAIL
+21:42:04.043 > # LIS3MDL unavailable after 5 attempts
+21:42:04.127 > 40918,nan,nan,nan,nan,25.45,24.77,7893,1115.25,29.62,0,1,1,0x00
+21:42:04.626 > 41418,nan,nan,nan,nan,25.47,24.69,7893,1115.25,29.62,0,1,1,0x00
+21:42:05.121 > 41918,nan,nan,nan,nan,25.47,24.73,7893,1115.25,29.62,0,1,1,0x00
+21:42:05.442 > # LIS3MDL begin attempt 1/5
+21:42:05.442 > # LIS3MDL FAIL
+21:42:05.594 > # LIS3MDL begin attempt 2/5
+21:42:05.594 > # LIS3MDL FAIL
+21:42:05.741 > # LIS3MDL begin attempt 3/5
+21:42:05.741 > # LIS3MDL FAIL
+21:42:05.893 > # LIS3MDL begin attempt 4/5
+21:42:05.893 > # LIS3MDL FAIL
+21:42:06.049 > # LIS3MDL begin attempt 5/5
+21:42:06.049 > # LIS3MDL FAIL
+21:42:06.049 > # LIS3MDL unavailable after 5 attempts
+21:42:06.128 > 42918,nan,nan,nan,nan,25.49,24.89,7893,1115.25,29.62,0,1,1,0x00
+21:42:06.626 > 43418,nan,nan,nan,nan,25.47,24.65,7893,1115.25,29.62,0,1,1,0x00

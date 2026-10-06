@@ -69,6 +69,18 @@ $pioExe = "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe"
 
 ## 출력과 확인
 
+정상적으로 이 프로젝트를 실행하면 부팅 메시지에 `# MKRZERO SENSOR TEST v2`가 나오고,
+이어 CSV 헤더(`time_ms,mag_x_uT,...`)와 0.5초 간격의 측정 행이 출력된다.
+`STATUS ready=0 total=0 gyro=0 accel=0 quat=0 age_ms=4294967295`는 이 프로젝트 펌웨어의 출력이 아니다.
+이 메시지가 보이면 이전/다른 펌웨어가 올라가 있거나 다른 장치의 COM 포트를 모니터링 중일 수 있다.
+업로드 전에 모니터를 닫고, 아래 예시처럼 이 폴더의 `all_sensors`를 지정해 COM4에 업로드한 다음 다시 모니터를 연다.
+
+```powershell
+$pioExe = "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe"
+& $pioExe run -d mkrzero_sensor_test -e all_sensors -t upload --upload-port COM4
+& $pioExe device monitor -d mkrzero_sensor_test -e all_sensors -p COM4 -b 115200
+```
+
 | 출력/검사 | 의미 또는 정상 조건 |
 | --- | --- |
 | 센서 READY | 초기 통신 확인. MAX31865는 쓰기/읽기 검증 포함 |

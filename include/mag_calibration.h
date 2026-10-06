@@ -1,5 +1,4 @@
 #pragma once
-
 #include <math.h>
 #include "mag_calibration_params.h"
 

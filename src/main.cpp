@@ -34,7 +34,7 @@ constexpr uint32_t MLX90614_COOLDOWN_MS = 10000;
 constexpr uint32_t PERIODIC_REINIT_INTERVAL_MS = 5UL * 60UL * 1000UL;
 
 constexpr float RTD_NOMINAL_OHM = 1000.0f;  // PT1000
-constexpr float RTD_REFERENCE_OHM = 4630.0f;
+constexpr float RTD_REFERENCE_OHM = 4344.0f;
 
 Adafruit_LIS3MDL magnetometer;
 Adafruit_MLX90614 infrared;

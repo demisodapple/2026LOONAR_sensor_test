@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from capture_serial import FIRMWARE_HEADER, capture
+from capture_serial import FIRMWARE_HEADER, LEGACY_FIRMWARE_HEADER, capture
 
 
 class CaptureTests(unittest.TestCase):
@@ -15,6 +15,18 @@ class CaptureTests(unittest.TestCase):
         self.assertEqual(capture(["# already running", ",".join(row)], csv_out, raw_out), 1)
         rows = list(csv.reader(io.StringIO(csv_out.getvalue())))
         self.assertEqual(rows, [FIRMWARE_HEADER, row])
+
+    def test_legacy_rows_without_header(self):
+        row = ["500"] + ["1"] * (len(LEGACY_FIRMWARE_HEADER) - 1)
+        csv_out, raw_out = io.StringIO(), io.StringIO()
+        self.assertEqual(capture([",".join(row)], csv_out, raw_out), 1)
+        self.assertEqual(list(csv.reader(io.StringIO(csv_out.getvalue()))),
+                         [LEGACY_FIRMWARE_HEADER, row])
+
+    def test_lis_only_schema(self):
+        self.assertEqual(len(FIRMWARE_HEADER), 20)
+        self.assertFalse(any("qmc" in field or "lis3mdl_" in field
+                             for field in FIRMWARE_HEADER))
 
     def test_preserves_invalid_rows_and_ignores_diagnostics(self):
         header = "time_ms,mag_x_uT,mag_y_uT,mag_z_uT,mag_valid"

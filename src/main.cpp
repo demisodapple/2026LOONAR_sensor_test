@@ -13,8 +13,8 @@ constexpr uint8_t PIN_MAX31865_CS = 10;
 constexpr uint8_t BOARD_SPI_MOSI = 11;
 constexpr uint8_t BOARD_SPI_MISO = 12;
 constexpr uint8_t BOARD_SPI_SCK = 13;
-constexpr uint8_t PIN_LIS3MDL_SDA = 25;
-constexpr uint8_t PIN_LIS3MDL_SCL = 24;
+constexpr uint8_t PIN_LIS3MDL_SDA = 18;
+constexpr uint8_t PIN_LIS3MDL_SCL = 19;
 constexpr uint8_t PIN_MLX90614_SDA = 17;
 constexpr uint8_t PIN_MLX90614_SCL = 16;
 constexpr uint32_t MAX31865_SPI_CLOCK_HZ = 1000000;
@@ -36,16 +36,15 @@ constexpr uint32_t PERIODIC_REINIT_INTERVAL_MS = 5UL * 60UL * 1000UL;
 constexpr float RTD_NOMINAL_OHM = 1000.0f;  // PT1000
 constexpr float RTD_REFERENCE_OHM = 4344.0f;
 
-Adafruit_LIS3MDL magnetometer;
+Adafruit_LIS3MDL lisMagnetometer;
 Adafruit_MLX90614 infrared;
 // Adafruit_MAX31865 v1.6.2 configures this hardware SPI device for
 // 1 MHz, MSB first, SPI_MODE1. Pass &SPI explicitly so Teensy uses SPI0.
 Adafruit_MAX31865 rtd(PIN_MAX31865_CS, &SPI);
 
-bool magnetometerReady = false;
+bool lisMagnetometerReady = false;
 bool infraredReady = false;
 bool rtdReady = false;
-uint8_t magnetometerAddress = 0;
 uint32_t lastSampleMs = 0;
 uint32_t lastRetryMs = 0;
 uint32_t mlxNextRetryMs = 0;
@@ -63,96 +62,20 @@ void printFloatOrNan(float value, uint8_t digits) {
   else Serial.print("nan");
 }
 
-void printLis3mdlLineState(const char* phase) {
-  const int sda = digitalRead(PIN_LIS3MDL_SDA);
-  const int scl = digitalRead(PIN_LIS3MDL_SCL);
-
-  Serial.print("# LIS3MDL BUS STATE phase=");
-  Serial.print(phase);
-  Serial.print(" SDA25=");
-  Serial.print(sda);
-  Serial.print(" SCL24=");
-  Serial.print(scl);
-  Serial.print(" state=");
-  if (sda == HIGH && scl == HIGH) Serial.println("IDLE_HIGH");
-  else if (sda == LOW && scl == HIGH) Serial.println("SDA_STUCK_LOW");
-  else if (sda == HIGH && scl == LOW) Serial.println("SCL_STUCK_LOW");
-  else Serial.println("BOTH_STUCK_LOW");
-}
-
-void diagnoseLis3mdlBus(const char* reason) {
-  // Capture the electrical state before any recovery or begin() call changes
-  // the I2C peripheral or generates additional clocks.
-  const int sda = digitalRead(PIN_LIS3MDL_SDA);
-  const int scl = digitalRead(PIN_LIS3MDL_SCL);
-
-  Serial.print("# LIS3MDL BUS DIAG reason=");
-  Serial.print(reason);
-  Serial.print(" SDA25=");
-  Serial.print(sda);
-  Serial.print(" SCL24=");
-  Serial.print(scl);
-  Serial.print(" state=");
-  if (sda == HIGH && scl == HIGH) Serial.println("IDLE_HIGH");
-  else if (sda == LOW && scl == HIGH) Serial.println("SDA_STUCK_LOW");
-  else if (sda == HIGH && scl == LOW) Serial.println("SCL_STUCK_LOW");
-  else Serial.println("BOTH_STUCK_LOW");
-
-  // Only issue a real register transaction when the bus is electrically idle.
-  // This is not an address-only scanner probe.
-  if (sda != HIGH || scl != HIGH || magnetometerAddress == 0) return;
-
-  constexpr uint8_t WHO_AM_I_REG = 0x0F;
-  Wire2.beginTransmission(magnetometerAddress);
-  Wire2.write(WHO_AM_I_REG);
-  const uint8_t txError = Wire2.endTransmission(false);
-  uint8_t rxCount = 0;
-  int whoAmI = -1;
-  if (txError == 0) {
-    rxCount = Wire2.requestFrom(magnetometerAddress, static_cast<uint8_t>(1),
-                                static_cast<uint8_t>(true));
-    if (rxCount == 1 && Wire2.available()) whoAmI = Wire2.read();
-  }
-
-  Serial.print("# LIS3MDL REG DIAG address=0x");
-  printHexByte(magnetometerAddress);
-  Serial.print(" tx_error=");
-  Serial.print(txError);
-  Serial.print(" rx_count=");
-  Serial.print(rxCount);
-  Serial.print(" who_am_i=");
-  if (whoAmI < 0) Serial.println("none");
-  else {
-    Serial.print("0x");
-    printHexByte(static_cast<uint8_t>(whoAmI));
-    Serial.println(whoAmI == 0x3D ? " OK" : " INVALID");
-  }
-}
-
-bool beginMagnetometer() {
-  printLis3mdlLineState("before_sensor_begin");
-  if (magnetometer.begin_I2C(0x1C, &Wire2)) {
-    magnetometerAddress = 0x1C;
-  } else if (magnetometer.begin_I2C(0x1E, &Wire2)) {
-    magnetometerAddress = 0x1E;
-  } else {
-    Wire2.setClock(I2C_CLOCK_HZ);
-    // Preserve the last known address until diagnostics are complete.
-    diagnoseLis3mdlBus("begin_failed");
-    Serial.println("# LIS3MDL FAIL: no response at 0x1C or 0x1E");
+bool beginLisMagnetometer() {
+  if (!lisMagnetometer.begin_I2C(0x1C, &Wire) &&
+      !lisMagnetometer.begin_I2C(0x1E, &Wire)) {
+    Wire.setClock(I2C_CLOCK_HZ);
+    Serial.println("# LIS3MDL FAIL on Wire: no response at 0x1C or 0x1E");
     return false;
   }
-
-  printLis3mdlLineState("after_sensor_begin");
-  Wire2.setClock(I2C_CLOCK_HZ);
-  magnetometer.setPerformanceMode(LIS3MDL_MEDIUMMODE);
-  magnetometer.setOperationMode(LIS3MDL_CONTINUOUSMODE);
-  magnetometer.setDataRate(LIS3MDL_DATARATE_20_HZ);
-  magnetometer.setRange(LIS3MDL_RANGE_4_GAUSS);
-  printLis3mdlLineState("after_sensor_config");
-  Serial.print("# LIS3MDL READY at 0x");
-  printHexByte(magnetometerAddress);
-  Serial.println();
+  // Library begin() resets the bus clock; restore the chosen clock.
+  Wire.setClock(I2C_CLOCK_HZ);
+  lisMagnetometer.setPerformanceMode(LIS3MDL_MEDIUMMODE);
+  lisMagnetometer.setOperationMode(LIS3MDL_CONTINUOUSMODE);
+  lisMagnetometer.setDataRate(LIS3MDL_DATARATE_20_HZ);
+  lisMagnetometer.setRange(LIS3MDL_RANGE_4_GAUSS);
+  Serial.println("# LIS3MDL READY on Wire; 20Hz, +/-4G");
   return true;
 }
 
@@ -275,19 +198,18 @@ void reinitializeSensors(const char* reason) {
   digitalWrite(PIN_MAX31865_CS, HIGH);
   SPI.begin();
 
-  Wire2.setSDA(PIN_LIS3MDL_SDA);
-  Wire2.setSCL(PIN_LIS3MDL_SCL);
-  Wire2.begin();
-  Wire2.setClock(I2C_CLOCK_HZ);
+  Wire.setSDA(PIN_LIS3MDL_SDA);
+  Wire.setSCL(PIN_LIS3MDL_SCL);
+  Wire.begin();
+  Wire.setClock(I2C_CLOCK_HZ);
   Wire1.setSDA(PIN_MLX90614_SDA);
   Wire1.setSCL(PIN_MLX90614_SCL);
   Wire1.begin();
   Wire1.setClock(MLX90614_I2C_CLOCK_HZ);
   delay(BUS_STABILIZE_MS);
   delay(WIRE_STABILIZE_MS - BUS_STABILIZE_MS);
-  printLis3mdlLineState("after_wire2_reinit");
 
-  magnetometerReady = beginWithRetries("LIS3MDL", beginMagnetometer);
+  lisMagnetometerReady = beginWithRetries("LIS3MDL", beginLisMagnetometer);
   infraredReady = beginWithRetries("MLX90614", beginInfrared);
   rtdReady = beginWithRetries("MAX31865", beginRtd);
 
@@ -299,7 +221,7 @@ void reinitializeSensors(const char* reason) {
   lastPeriodicReinitMs = completedMs;
 
   Serial.print("# SENSOR REINITIALIZATION END LIS3MDL=");
-  Serial.print(magnetometerReady ? 1 : 0);
+  Serial.print(lisMagnetometerReady ? 1 : 0);
   Serial.print(" MLX90614=");
   Serial.print(infraredReady ? 1 : 0);
   Serial.print(" MAX31865=");
@@ -310,8 +232,8 @@ void reinitializeSensors(const char* reason) {
 void retryMissingSensors(uint32_t now) {
   if (now - lastRetryMs < RETRY_INTERVAL_MS) return;
   lastRetryMs = now;
-  if (!magnetometerReady)
-    magnetometerReady = beginWithRetries("LIS3MDL", beginMagnetometer);
+  if (!lisMagnetometerReady)
+    lisMagnetometerReady = beginWithRetries("LIS3MDL", beginLisMagnetometer);
   if (!rtdReady) rtdReady = beginWithRetries("MAX31865", beginRtd);
 }
 
@@ -357,17 +279,16 @@ void setup() {
   pinMode(PIN_MAX31865_CS, OUTPUT);
   digitalWrite(PIN_MAX31865_CS, HIGH);
   SPI.begin();
-  Wire2.setSDA(PIN_LIS3MDL_SDA);
-  Wire2.setSCL(PIN_LIS3MDL_SCL);
-  Wire2.begin();
-  Wire2.setClock(I2C_CLOCK_HZ);
+  Wire.setSDA(PIN_LIS3MDL_SDA);
+  Wire.setSCL(PIN_LIS3MDL_SCL);
+  Wire.begin();
+  Wire.setClock(I2C_CLOCK_HZ);
   Wire1.setSDA(PIN_MLX90614_SDA);
   Wire1.setSCL(PIN_MLX90614_SCL);
   Wire1.begin();
   Wire1.setClock(MLX90614_I2C_CLOCK_HZ);
   delay(BUS_STABILIZE_MS);
   delay(WIRE_STABILIZE_MS - BUS_STABILIZE_MS);
-  printLis3mdlLineState("after_wire2_setup");
 
   Serial.println();
   Serial.println("# TEENSY 4.1 THREE-SENSOR LOGGER");
@@ -389,7 +310,8 @@ void setup() {
   Serial.print(MAX31865_SPI_CLOCK_HZ);
   Serial.print("Hz mode=");
   Serial.println(MAX31865_SPI_MODE);
-  Serial.print("# I2C LIS3MDL Wire2: SDA=");
+  Serial.println("# CSV mag_* = LIS3MDL; magnetic field in uT");
+  Serial.print("# I2C LIS3MDL Wire: SDA=");
   Serial.print(PIN_LIS3MDL_SDA);
   Serial.print(" SCL=");
   Serial.print(PIN_LIS3MDL_SCL);
@@ -402,7 +324,7 @@ void setup() {
   Serial.print(" clock=");
   Serial.println(MLX90614_I2C_CLOCK_HZ);
 
-  magnetometerReady = beginWithRetries("LIS3MDL", beginMagnetometer);
+  lisMagnetometerReady = beginWithRetries("LIS3MDL", beginLisMagnetometer);
   infraredReady = beginWithRetries("MLX90614", beginInfrared);
   rtdReady = beginWithRetries("MAX31865", beginRtd);
 
@@ -433,15 +355,16 @@ void loop() {
   float magCal[4] = {NAN, NAN, NAN, NAN};
   bool magCalValid = false;
 
-  if (magnetometerReady) {
-    magValid = magnetometer.readMagneticField(magX, magY, magZ);
+  if (lisMagnetometerReady) {
+    magValid = lisMagnetometer.readMagneticField(magX, magY, magZ) &&
+               isfinite(magX) && isfinite(magY) && isfinite(magZ);
     if (magValid) {
       magNorm = sqrtf(magX * magX + magY * magY + magZ * magZ);
       magCalValid = magcal::apply(magX, magY, magZ, magCal);
     } else {
-      diagnoseLis3mdlBus("read_failed");
-      Serial.println("# LIS3MDL read failed; scheduling reinitialization");
-      magnetometerReady = false;
+      magX = magY = magZ = NAN;
+      lisMagnetometerReady = false;
+      Serial.println("# LIS3MDL read failed; scheduling Wire retry");
     }
   }
 
